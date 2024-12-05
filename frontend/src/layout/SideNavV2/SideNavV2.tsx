@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import "./SideNav.scss";
 import FlexboxGridItem from "rsuite/esm/FlexboxGrid/FlexboxGridItem";
 import DropDown from "@/atoms/icons/DropDown";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export interface SideNavProps {
   routes: TRoutes[];
@@ -13,6 +15,11 @@ export interface SideNavProps {
 
 const SideNavV2 = (props: SideNavProps) => {
   const { routes, selectedRoute } = props;
+  const redux = useSelector((state: RootState) => state.route);
+  // console.log(">>>>>>>>>>>>>>>>>>>REDUX LOG>>>>>>>> ", selectedRoute);
+  const counter = useSelector((state: RootState) => state.user.value);
+  console.log(">>>>>>REDUX STORE>>>>>>", counter, redux);
+
 
   //states
   const [expanded, setExpanded] = React.useState(true);
