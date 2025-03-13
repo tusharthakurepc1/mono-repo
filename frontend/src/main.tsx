@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
 
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  // <StrictMode>
     <CustomProvider theme="light">
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
@@ -29,5 +29,5 @@ createRoot(document.getElementById("root")!).render(
         </QueryClientProvider>
       </Provider>
     </CustomProvider>
-  </StrictMode>
+  // </StrictMode>
 );

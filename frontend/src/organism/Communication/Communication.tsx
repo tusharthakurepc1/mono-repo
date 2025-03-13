@@ -1,6 +1,6 @@
 // Modules
 import React from "react";
-import Moment from 'moment';
+import Moment from "moment";
 // Redux Store
 import { useSelector } from "react-redux";
 import { getAuthUser } from "@/store/auth";
@@ -17,6 +17,8 @@ import FlexboxGridItem from "rsuite/esm/FlexboxGrid/FlexboxGridItem";
 // Style
 import style from "./Communication.module.scss";
 import classNames from "classnames/bind";
+
+import FingerprintJS, { GetResult } from "@fingerprintjs/fingerprintjs";
 const cx = classNames.bind(style);
 
 export interface IUserCommChat {
@@ -45,6 +47,8 @@ const Communication = () => {
   const [currentUserMessages, setCurrentUserMessages] =
     React.useState<IUserCommChat | null>(null);
   const currentUserMessagesRef = React.useRef(currentUserMessages);
+  const [fingerprintDetails, setFingerprintDetails] =
+    React.useState<GetResult | null>(null);
 
   React.useEffect(() => {
     currentUserMessagesRef.current = currentUserMessages;
@@ -57,7 +61,7 @@ const Communication = () => {
       message,
       user_id: loggedInUser.user?._id || "",
       user_name: loggedInUser.user?.first_name || "",
-      created_at: Moment.utc().utcOffset("+05:30").format('hh:mm a'),
+      created_at: Moment.utc().utcOffset("+05:30").format("hh:mm a"),
     };
 
     if (currentUserMessages) {
@@ -75,6 +79,7 @@ const Communication = () => {
           sender_id: loggedInUser.user?._id,
           receiver_id: currentUserMessages?.receiver_id,
           message,
+          visitor_id: fingerprintDetails?.visitorId || "",
         })
       );
     }
@@ -100,22 +105,28 @@ const Communication = () => {
     fetchCommunicationUsers();
 
     // Socket IO connection url
-    const newSocket = io("http://localhost:8080", {
-      transports: ["websocket"],
-    });
-    setSocket(newSocket);
+    const getFingerprintDetails = async () => {
+      const fp = await FingerprintJS.load();
+      const deviceFingerprint = await fp.get();
 
-    // Initial socket event for mapping
-    newSocket.emit(
-      "init",
-      JSON.stringify({
-        user_id: loggedInUser.user?._id,
-      })
-    );
+      const newSocket = io("http://localhost:8080", {
+        transports: ["websocket"],
+      });
+      setSocket(newSocket);
 
-    return () => {
-      newSocket.disconnect();
+      if (deviceFingerprint) {
+        setFingerprintDetails(deviceFingerprint);
+      }
+
+      newSocket.emit(
+        "init",
+        JSON.stringify({
+          user_id: loggedInUser.user?._id,
+          visitor_id: deviceFingerprint.visitorId,
+        })
+      );
     };
+    getFingerprintDetails();
   }, []);
 
   React.useEffect(() => {
@@ -165,7 +176,7 @@ const Communication = () => {
               onClick={() => {
                 handleUserChange(index);
               }}
-              id={`chat-item-${index+1}`}
+              id={`chat-item-${index + 1}`}
             >
               <FlexboxGrid justify="space-between">
                 <FlexboxGridItem>{user.name}</FlexboxGridItem>

@@ -66,7 +66,7 @@ class App {
   }
 
   public initilizeSocketEvents = () => {
-    this.io.on("connection", (socket) => {
+    this.io.on("connection", async (socket) => {
       SOCKET_EVENTS_NAMES.forEach((eventName) => {
         socket.on(
           eventName,

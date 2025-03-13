@@ -137,6 +137,63 @@ class UserDao {
       }
     );
   };
+
+  public getSocketDetails = async (payload: {
+    user_id: string;
+    visitor_id: string;
+  }) => {
+    const { user_id, visitor_id } = payload;
+
+    return await this.userModel.findOne({
+      _id: user_id,
+      "socket_details.device_fingerprint_id": visitor_id,
+    });
+  };
+
+  public addSocketByDeviceFingerprint = async (payload: {
+    user_id: string;
+    socket_id: string;
+    visitor_id: string;
+  }) => {
+    const { user_id, visitor_id, socket_id } = payload;
+
+    return await this.userModel.updateOne(
+      {
+        _id: user_id,
+      },
+      {
+        $addToSet: {
+          socket_details: {
+            socket_id,
+            device_fingerprint_id: visitor_id,
+          },
+        },
+      }
+    );
+  };
+
+  public updateSocketByDeviceFingerprint = async (payload: {
+    user_id: string;
+    socket_id: string;
+    visitor_id: string;
+  }) => {
+    const { user_id, visitor_id, socket_id } = payload;
+
+    return await this.userModel.updateOne(
+      {
+        _id: user_id,
+        "socket_details.device_fingerprint_id": visitor_id,
+      },
+      {
+        $set: {
+          socket_details: {
+            socket_id,
+            device_fingerprint_id: visitor_id,
+          },
+        },
+      }
+    );
+  };
 }
 
 export default UserDao;

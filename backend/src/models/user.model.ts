@@ -16,8 +16,15 @@ export const IFriendsRequest = new Schema({
 
 export const IBlockedRequest = new Schema({
   user_id: String, // Other person user id
-  blocked_status: String,  // Blocked by whom
-  block_origin: String,   // from decline-friend-request or blocked
+  blocked_status: String, // Blocked by whom
+  block_origin: String, // from decline-friend-request or blocked
+});
+
+export const ISocketDetails = new Schema({
+  socket_id: String, // unique socket identifier
+  device_fingerprint_id: String, // Unique identifier for user device (device fingerprint)
+  // status: String, // online or offline
+  // last_updated_at: Date, // last time this perticular socket online
 });
 
 export const ROLES = ["director", "admin", "users"];
@@ -26,12 +33,13 @@ const UserSchema = new Schema(
   {
     first_name: { type: String, require: true },
     last_name: { type: String, require: true },
-    contact: { type: String, require: true },
+    contact: { type: String, require: true }, // @depricated
     email: { type: String, require: true },
-    roles: { type: Array(String), enum: ROLES, require: true }, // user, admin, director, etc.
-    level: { type: Number, default: 1 }, // Level of the user
+    roles: { type: Array(String), enum: ROLES, require: true }, // user, admin, director, etc.  // @TODO implementation
+    level: { type: Number, default: 1 }, // Level of the user // @TODO implementation
     origin: { type: IOrigin, default: undefined },
     email_verified: { type: Boolean, default: false },
+    socket_details: { type: Array(ISocketDetails), default: [] }, // Contain all the socket details
 
     // Community Field :: TODO ::
     friends_ids: { type: Array(String), default: [] }, // Contain all the friends user id
