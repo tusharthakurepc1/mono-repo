@@ -1,13 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import UserService from "@/services/user.service";
 
 class UserController {
   private userService = new UserService();
-
-  public createUser = async (_req: Request, res: Response): Promise<any> => {
-    const response = await this.userService.createUser();
-    return res.send({ response });
-  };
 
   public getUsers = async (req: Request, res: Response): Promise<any> => {
     if (!req.user?._id) {
@@ -25,6 +20,20 @@ class UserController {
     });
 
     return res.status(200).send({ status: true });
+  };
+
+  public getDashboardSummary = async (
+    req: Request,
+    res: Response
+  ): Promise<any> => {
+    const user = req.user;
+    if (!user?._id) {
+      return res.status(401);
+    }
+
+    const response = await this.userService.getSummaryDetails(user._id);
+
+    return res.send({ data: response });
   };
 }
 

@@ -57,21 +57,21 @@ const AllFriendsCommunity = () => {
     {
       title: "Name",
       columnDataKey: "name",
-      width: 250,
+      width: 2,
     },
     {
       title: "Username",
       columnDataKey: "username",
-      width: 250,
+      width: 2,
     },
     {
       title: "User Id",
       columnDataKey: "user_id",
-      width: 200,
+      width: 2,
     },
     {
       title: "Actions",
-      width: 115,
+      width: 3,
       actionCell: true,
       actionDatum: (rowData: IFriendCommunity) => {
         if (rowData.friends_details?.request_status === "send") {
@@ -136,7 +136,7 @@ const AllFriendsCommunity = () => {
         {/* New Friends List */}
         <FlexboxGridItem colspan={24}>
           <Table
-            datum={friendsCommunityUsers.data}
+            datum={friendsCommunityUsers?.data || []}
             columnsDetails={columnsDetails}
             pagination={pagination}
             refetchDatum={setPagination}

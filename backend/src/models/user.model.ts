@@ -33,15 +33,16 @@ const UserSchema = new Schema(
   {
     first_name: { type: String, require: true },
     last_name: { type: String, require: true },
-    contact: { type: String, require: true }, // @depricated
     email: { type: String, require: true },
-    roles: { type: Array(String), enum: ROLES, require: true }, // user, admin, director, etc.  // @TODO implementation
-    level: { type: Number, default: 1 }, // Level of the user // @TODO implementation
-    origin: { type: IOrigin, default: undefined },
+    user_profile_picture: { type: String, default: undefined },
     email_verified: { type: Boolean, default: false },
+    roles: { type: Array(String), enum: ROLES, require: true }, // user, admin, director, etc.
+    level: { type: Number, default: 1 }, // Level of the user
+    contact: { type: String }, // Still @depricated
+    origin: { type: IOrigin, default: undefined },
     socket_details: { type: Array(ISocketDetails), default: [] }, // Contain all the socket details
-
-    // Community Field :: TODO ::
+    
+    // Community Field
     friends_ids: { type: Array(String), default: [] }, // Contain all the friends user id
     requested_friends: { type: Array(IFriendsRequest), default: [] }, // Contain all the users who request to make friend
     blocked_user: { type: Array(IBlockedRequest), default: [] }, // Contain all the blocked users for the perticular user
@@ -58,7 +59,7 @@ const UserSchema = new Schema(
  * Case 2 :: User 2 accept the req of User 2 => User 1 and User 2 both move to friend_ids and removed from requested_friends
  * Case 3 :: User 2 reject the req of User 2 => User 1 and User 2 both move to blocked user with their respective status and removed from requested_friend
  * Case 4 :: User 1 blocked the User 2 => User 1 and User 2 both move to blocked user with their respective status and removed from friend_ids
- * Case 5 :: User 1 unblock the User 2 => User 1 and User 2 bothe removed from the blocked user
+ * Case 5 :: User 1 unblock the User 2 => User 1 and User 2 both removed from the blocked user
  */
 
 const UsersModel = dbConnection.model("users", UserSchema);
