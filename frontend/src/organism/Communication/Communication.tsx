@@ -82,7 +82,7 @@ const Communication = () => {
           sender_id: loggedInUser.user?._id,
           receiver_id: currentUserMessages?.receiver_id,
           message,
-          visitor_id: fingerprintDetails?.visitorId || "",
+          fingerprint_id: fingerprintDetails?.visitorId || "",
         })
       );
     }
@@ -93,7 +93,7 @@ const Communication = () => {
   const handleUserChange = React.useCallback(
     async (currentUserIndex: number) => {
       const response = await getUserChatsDetails(
-        userList[currentUserIndex].user_id
+        userList[currentUserIndex]?.user_id
       );
 
       setCurrentUserMessages({ ...response.data, index: currentUserIndex });
@@ -102,9 +102,9 @@ const Communication = () => {
   );
 
   // Fetch the First user message default
-  React.useEffect(() => {
-    handleUserChange(0);
-  }, [userList]);
+  // React.useEffect(() => {
+  //   handleUserChange(0);
+  // }, [userList]);
 
   React.useEffect(() => {
     const fetchCommunicationUsers = async () => {
@@ -131,7 +131,7 @@ const Communication = () => {
         "init",
         JSON.stringify({
           user_id: loggedInUser.user?._id,
-          visitor_id: deviceFingerprint.visitorId,
+          fingerprint_id: deviceFingerprint.visitorId,
         })
       );
     };
@@ -145,7 +145,7 @@ const Communication = () => {
       created_at: string;
     }) => {
       const { user_id, message, created_at } = datum;
-
+      console.log("DATUM RECEIVED>>>>>>>", datum);
       if (user_id !== currentUserMessagesRef.current?.receiver_id) {
         return;
       }

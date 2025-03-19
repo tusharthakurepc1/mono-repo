@@ -1,20 +1,22 @@
 import CommunicationService from "@/services/communication.service";
 import UserDao from "@/dao/user.dao";
-import { Server, Socket } from "socket.io";
+import SocketDao from "@/dao/socket.dao";
+import { Server } from "socket.io";
 import moment from "moment";
+import { InhouseSocket } from "@/types/socket";
 
 export interface ISocketEvent {
   eventName: string;
   io: Server;
-  socket: Socket;
+  socket: InhouseSocket;
 }
 
 class SocketEvents {
   private io: Server;
   private communicationService = new CommunicationService();
-  private usersSocketHash = new Map();
 
-  private userDao = new UserDao();
+  // Daos
+  private socketDao = new SocketDao();
 
   public initializeSocketEvents(payload: ISocketEvent) {
     const { eventName, socket, io } = payload;
@@ -23,30 +25,19 @@ class SocketEvents {
     switch (eventName) {
       case "init":
         return async (payload: string) => {
-          // Update the socket.id with the fingerprint id of system and store in the db
-          // If fingerprint not found then add otherwise pass
           const parsedPayload = JSON.parse(payload);
-          const { user_id, visitor_id } = parsedPayload;
-          if (!user_id || !visitor_id) {
+          const { user_id, fingerprint_id } = parsedPayload;
+          if (!user_id || !fingerprint_id) {
             return;
           }
 
-          const response = await this.userDao.getSocketDetails(parsedPayload);
-          if (!response) {
-            // Assign a new socket with fingerprint details
-            await this.userDao.addSocketByDeviceFingerprint({
-              user_id,
-              visitor_id,
-              socket_id: socket.id,
-            });
-          } else {
-            // Update the socket details with existing fingerprint details
-            await this.userDao.updateSocketByDeviceFingerprint({
-              user_id,
-              visitor_id,
-              socket_id: socket.id,
-            });
-          }
+          console.log("SOCKET ID>>>>>>>>>", socket.id, user_id);
+
+          // await this.socketDao.createSocketDetails({
+          //   user_id,
+          //   socket_id: socket.id,
+          //   device_fingerprint_id: fingerprint_id,
+          // })
         };
       case "new-chat-message":
         return this.addNewChatMessage;
@@ -63,18 +54,22 @@ class SocketEvents {
 
   private addNewChatMessage = async (payload: string) => {
     const parsedPayload = JSON.parse(payload);
-    const { sender_id, receiver_id, message, visitor_id } = parsedPayload;
-    console.log(parsedPayload);
+    const { sender_id, receiver_id, message } = parsedPayload;
 
     if (sender_id && receiver_id && message) {
-      // await this.communicationService.createChat({
-      //   senderId: sender_id,
-      //   receiverId: receiver_id,
-      //   message,
-      // });
 
-      const receiverSocketId = this.usersSocketHash.get(receiver_id);
-      this.io.to(receiverSocketId).emit("received-user-chat", {
+      const [receiverSocketDetails] = await Promise.all([
+        this.socketDao.getSocketDetailsByUserId(receiver_id),
+        // this.communicationService.createChat({
+        //   senderId: sender_id,
+        //   receiverId: receiver_id,
+        //   message,
+        // }),
+      ]);
+
+      console.log("RECEIVE SD>>>>>>>", receiverSocketDetails);
+
+      this.io.to(receiverSocketDetails?.socket_id).emit("received-user-chat", {
         user_id: sender_id,
         message,
         created_at: moment.utc().format("hh:mm a"),

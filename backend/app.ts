@@ -5,6 +5,7 @@ import cookieSession from "cookie-session";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import SocketEvents from "@/events/socket.events";
+import { InhouseSocket } from "@/types/socket";
 import {
   PORT,
   serviceName,
@@ -65,7 +66,7 @@ class App {
   }
 
   public initilizeSocketEvents = () => {
-    this.io.on("connection", async (socket) => {
+    this.io.on("connection", async (socket: InhouseSocket) => {
       SOCKET_EVENTS_NAMES.forEach((eventName) => {
         socket.on(
           eventName,

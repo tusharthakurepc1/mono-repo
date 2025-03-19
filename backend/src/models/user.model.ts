@@ -20,12 +20,12 @@ export const IBlockedRequest = new Schema({
   block_origin: String, // from decline-friend-request or blocked
 });
 
-export const ISocketDetails = new Schema({
-  socket_id: String, // unique socket identifier
-  device_fingerprint_id: String, // Unique identifier for user device (device fingerprint)
-  // status: String, // online or offline
-  // last_updated_at: Date, // last time this perticular socket online
-});
+// export const ISocketDetails = new Schema({
+//   socket_id: String, // unique socket identifier
+//   device_fingerprint_id: String, // Unique identifier for user device (device fingerprint)
+//   // status: String, // online or offline
+//   // last_updated_at: Date, // last time this perticular socket online
+// });
 
 export const ROLES = ["director", "admin", "users"];
 
@@ -40,7 +40,7 @@ const UserSchema = new Schema(
     level: { type: Number, default: 1 }, // Level of the user
     contact: { type: String }, // Still @depricated
     origin: { type: IOrigin, default: undefined },
-    socket_details: { type: Array(ISocketDetails), default: [] }, // Contain all the socket details
+    // socket_details: { type: Array(ISocketDetails), default: [] }, // Contain all the socket details
     
     // Community Field
     friends_ids: { type: Array(String), default: [] }, // Contain all the friends user id
